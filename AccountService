@@ -1,27 +1,30 @@
 public with sharing class AccountService {
     
     public static List<Account> getActiveAccounts(Integer limitCount) {
-        // RECOMMENDED: Higher default limit of 100
+        // TO BE REPLACED: This default limit should be replaced with 100 from Dev Sandbox 1
         if (limitCount == null || limitCount <= 0) {
-            limitCount = 100; // This higher value should be kept in conflict resolution
+            limitCount = 50;
         }
         
-        // RECOMMENDED: Including Rating field in query
-        // TO BE REPLACED: ORDER BY clause should be replaced with AnnualRevenue DESC from Dev Sandbox 2
+        // TO BE REPLACED: Rating field should be added from Dev Sandbox 1
+        // RECOMMENDED: Using revenue-based sort order
         return [
-            SELECT Id, Name, Type, Industry, AnnualRevenue, Rating /* Rating field to keep in conflict resolution */
+            SELECT Id, Name, Type, Industry, AnnualRevenue /* Add Rating field here from Dev Sandbox 1 */
             FROM Account 
             WHERE IsActive__c = true 
-            ORDER BY Name ASC 
+            ORDER BY AnnualRevenue DESC /* Keep this revenue-based sorting in conflict resolution */
             LIMIT :limitCount
         ];
     }
     
+    // RECOMMENDED: Includes null check for defensive programming
     public static Decimal calculateTotalRevenue(List<Account> accounts) {
-        // TO BE REPLACED: This entire method should be replaced with Dev Sandbox 2's version 
-        // which includes the null check for better defensive programming
-        Decimal totalRevenue = 0;
+        // Keep this entire method implementation in conflict resolution
+        if (accounts == null || accounts.isEmpty()) {
+            return 0.00;
+        }
         
+        Decimal totalRevenue = 0;
         for (Account acc : accounts) {
             if (acc.AnnualRevenue != null) {
                 totalRevenue += acc.AnnualRevenue;
