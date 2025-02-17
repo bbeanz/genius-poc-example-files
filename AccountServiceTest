@@ -2,24 +2,22 @@
 private class AccountServiceTest {
     
     @TestSetup
-    // RECOMMENDED: Includes Rating field in test data setup
     static void setupTestData() {
+        // TO BE REPLACED: Rating field should be added from Dev Sandbox 1's test data setup
         List<Account> testAccounts = new List<Account>();
         
         for(Integer i = 0; i < 3; i++) {
             testAccounts.add(new Account(
                 Name = 'Test Account ' + i,
                 IsActive__c = true,
-                AnnualRevenue = 1000.00 * (i + 1),
-                Rating = 'Hot' // Keep this field in conflict resolution
+                AnnualRevenue = 1000.00 * (i + 1)
             ));
         }
         
         testAccounts.add(new Account(
             Name = 'Inactive Account',
             IsActive__c = false,
-            AnnualRevenue = 5000.00,
-            Rating = 'Warm' // Keep this field in conflict resolution
+            AnnualRevenue = 5000.00
         ));
         
         insert testAccounts;
@@ -31,9 +29,11 @@ private class AccountServiceTest {
         List<Account> activeAccounts = AccountService.getActiveAccounts(5);
         Test.stopTest();
         
-        // TO BE REPLACED: Additional assertion for revenue sorting from Dev Sandbox 2 should be added here
         System.assertEquals(3, activeAccounts.size(), 'Should return only active accounts');
         System.assert(activeAccounts[0].IsActive__c, 'Returned accounts should be active');
+        // RECOMMENDED: Additional assertion for revenue sorting
+        System.assert(activeAccounts[0].AnnualRevenue >= activeAccounts[1].AnnualRevenue, 
+            'Accounts should be sorted by revenue'); // Keep this assertion in conflict resolution
     }
     
     @IsTest
@@ -56,5 +56,13 @@ private class AccountServiceTest {
         System.assertEquals(6000.00, totalRevenue, 'Total revenue calculation mismatch');
     }
     
-    // TO BE ADDED: Additional test method for null input from Dev Sandbox 2 should be added here
+    // RECOMMENDED: Additional test method for null input scenario
+    @IsTest
+    static void testCalculateTotalRevenueWithNullInput() {
+        Test.startTest();
+        Decimal totalRevenue = AccountService.calculateTotalRevenue(null);
+        Test.stopTest();
+        
+        System.assertEquals(0.00, totalRevenue, 'Should return 0 for null input');
+    }
 }
