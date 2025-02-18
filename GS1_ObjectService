@@ -15,7 +15,6 @@ public with sharing class GS1_ObjectService {
             FROM GS1_Object__c 
             WHERE Copado_Picklist__c = 'High'
             ORDER BY CreatedDate DESC
-            WITH USER_MODE
             LIMIT :limitCount
         ];
     }
