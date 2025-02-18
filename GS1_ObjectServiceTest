@@ -7,28 +7,28 @@ private class GS1_ObjectServiceTest {
     // and includes null value test cases
     @TestSetup
     static void setupTestData() {
-        List<GS1_Object__c> testRecords = new List<GS1_Object__c>();
+        List<GS_1_Object__c> testRecords = new List<GS_1_Object__c>();
         
         // Create High priority records with various scenarios
-        testRecords.add(new GS1_Object__c(
+        testRecords.add(new GS_1_Object__c(
             Name = 'High Priority Complete',
             Copado_Picklist__c = 'High',
             Copado_Text__c = 'Test High Complete'
         ));
-        testRecords.add(new GS1_Object__c(
+        testRecords.add(new GS_1_Object__c(
             Name = 'High Priority No Text',
             Copado_Picklist__c = 'High'
         )); // Important edge case for null text
         
         // Create Medium priority records
-        testRecords.add(new GS1_Object__c(
+        testRecords.add(new GS_1_Object__c(
             Name = 'Medium Priority',
             Copado_Picklist__c = 'Medium',
             Copado_Text__c = 'Test Medium'
         ));
         
         // Create Low priority record
-        testRecords.add(new GS1_Object__c(
+        testRecords.add(new GS_1_Object__c(
             Name = 'Low Priority',
             Copado_Picklist__c = 'Low',
             Copado_Text__c = 'Test Low'
@@ -43,11 +43,11 @@ private class GS1_ObjectServiceTest {
     @IsTest
     static void testGetHighPriorityRecords() {
         Test.startTest();
-        List<GS1_Object__c> highPriorityRecords = GS1_ObjectService.getHighPriorityRecords(5);
+        List<GS_1_Object__c> highPriorityRecords = GS1_ObjectService.getHighPriorityRecords(5);
         Test.stopTest();
         
         System.assertEquals(2, highPriorityRecords.size(), 'Should return all high priority records');
-        for(GS1_Object__c record : highPriorityRecords) {
+        for(GS_1_Object__c record : highPriorityRecords) {
             System.assertEquals('High', record.Copado_Picklist__c, 'Should only return High priority records');
         }
     }
@@ -58,9 +58,9 @@ private class GS1_ObjectServiceTest {
     @IsTest
     static void testGetHighPriorityRecordsWithInvalidLimit() {
         Test.startTest();
-        List<GS1_Object__c> highPriorityRecords = GS1_ObjectService.getHighPriorityRecords(-1);
-        List<GS1_Object__c> zeroLimitRecords = GS1_ObjectService.getHighPriorityRecords(0);
-        List<GS1_Object__c> largeLimitRecords = GS1_ObjectService.getHighPriorityRecords(1000);
+        List<GS_1_Object__c> highPriorityRecords = GS1_ObjectService.getHighPriorityRecords(-1);
+        List<GS_1_Object__c> zeroLimitRecords = GS1_ObjectService.getHighPriorityRecords(0);
+        List<GS_1_Object__c> largeLimitRecords = GS1_ObjectService.getHighPriorityRecords(1000);
         Test.stopTest();
         
         // Comprehensive limit testing
@@ -98,8 +98,8 @@ private class GS1_ObjectServiceTest {
             }
             
             // Test with read access
-            TestDataFactory.grantAccess(testUser.Id, 'GS1_Object__c', 'Read');
-            List<GS1_Object__c> records = GS1_ObjectService.getHighPriorityRecords(5);
+            TestDataFactory.grantAccess(testUser.Id, 'GS_1_Object__c', 'Read');
+            List<GS_1_Object__c> records = GS1_ObjectService.getHighPriorityRecords(5);
             System.assertNotEquals(null, records, 'Should return records with read access');
         }
     }
