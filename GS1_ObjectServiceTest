@@ -1,0 +1,94 @@
+@IsTest
+private class GS1_ObjectServiceTest {
+    
+    // CONFLICT AREA #1: Test Data Setup
+    // Dev2 VERSION - NOT PREFERRED
+    // Less comprehensive test data setup
+    @TestSetup
+    static void setupTestData() {
+        List<GS1_Object__c> testRecords = new List<GS1_Object__c>();
+        
+        for(Integer i = 0; i < 3; i++) {
+            testRecords.add(new GS1_Object__c(
+                Name = 'Test Record ' + i,
+                Copado_Picklist__c = 'High',
+                Copado_Text__c = 'Test ' + i
+            ));
+        }
+        
+        insert testRecords;
+    }
+    
+    // CONFLICT AREA #2: Basic High Priority Test
+    // Dev2 VERSION - PREFERRED
+    // Better assertions and null handling
+    @IsTest
+    static void testGetHighPriorityRecords() {
+        Test.startTest();
+        List<GS1_Object__c> highPriorityRecords = GS1_ObjectService.getHighPriorityRecords(5);
+        Test.stopTest();
+        
+        System.assertNotEquals(null, highPriorityRecords, 'Should not return null');
+        for(GS1_Object__c record : highPriorityRecords) {
+            System.assertEquals('High', record.Copado_Picklist__c, 'Should only return High priority records');
+            System.assertNotEquals(null, record.Copado_Text__c, 'Text field should not be null');
+            System.assert(record.Copado_Text__c.length() > 0, 'Text field should not be empty');
+        }
+    }
+    
+    // CONFLICT AREA #3: Invalid Limit Test
+    // Dev2 VERSION - NOT PREFERRED
+    // Less comprehensive limit testing
+    @IsTest
+    static void testGetHighPriorityRecordsWithInvalidLimit() {
+        Test.startTest();
+        List<GS1_Object__c> highPriorityRecords = GS1_ObjectService.getHighPriorityRecords(-1);
+        Test.stopTest();
+        
+        System.assertNotEquals(null, highPriorityRecords, 'Should not return null for invalid limit');
+    }
+    
+    // CONFLICT AREA #4: Bulk Testing
+    // Dev2 VERSION - PREFERRED
+    // Important bulk data testing
+    @IsTest
+    static void testBulkDataScenarios() {
+        // Create bulk test data
+        List<GS1_Object__c> bulkRecords = new List<GS1_Object__c>();
+        for(Integer i = 0; i < 200; i++) {
+            bulkRecords.add(new GS1_Object__c(
+                Name = 'Bulk Record ' + i,
+                Copado_Picklist__c = 'High',
+                Copado_Text__c = 'Bulk Test ' + i
+            ));
+        }
+        insert bulkRecords;
+        
+        Test.startTest();
+        List<GS1_Object__c> results = GS1_ObjectService.getHighPriorityRecords(50);
+        Test.stopTest();
+        
+        System.assertEquals(50, results.size(), 'Should respect the limit parameter');
+        System.assert(!Limits.getQueries().equals(Limits.getLimitQueries()), 'Should use efficient queries');
+    }
+    
+    // CONFLICT AREA #5: Error Handling
+    // Dev2 VERSION - PREFERRED
+    // Better error handling scenarios
+    @IsTest
+    static void testErrorHandlingScenarios() {
+        try {
+            GS1_ObjectService.getHighPriorityRecords(Integer.valueOf('abc'));
+            System.assert(false, 'Should throw exception for invalid integer');
+        } catch(Exception e) {
+            System.assert(true, 'Exception handled properly');
+        }
+        
+        try {
+            GS1_ObjectService.getHighPriorityRecords(null);
+            System.assert(false, 'Should throw exception for null limit');
+        } catch(Exception e) {
+            System.assert(true, 'Null limit handled properly');
+        }
+    }
+}
