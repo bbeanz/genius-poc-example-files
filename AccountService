@@ -11,7 +11,7 @@ public with sharing class AccountService {
         return [
             SELECT Id, Name, Type, Industry, AnnualRevenue, Rating /* Rating field to keep in conflict resolution */
             FROM Account 
-            WHERE IsActive__c = true 
+            WHERE Ice_Hockey__c = true 
             ORDER BY Name ASC 
             LIMIT :limitCount
         ];
