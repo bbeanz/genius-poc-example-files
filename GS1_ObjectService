@@ -1,0 +1,40 @@
+public with sharing class GS1_ObjectService {
+    
+    public static List<GS1_Object__c> getHighPriorityRecords(Integer limitCount) {
+        // Verify CRUD permissions
+        if (!GS1_Object__c.SObjectType.getDescribe().isAccessible()) {
+            throw new SecurityException('User does not have access to GS1_Object__c');
+        }
+        
+        if (limitCount == null || limitCount <= 0) {
+            limitCount = 100;
+        }
+        
+        return [
+            SELECT Id, Name, Copado_Picklist__c, Copado_Text__c
+            FROM GS1_Object__c 
+            WHERE Copado_Picklist__c = 'High'
+            ORDER BY CreatedDate DESC
+            WITH USER_MODE
+            LIMIT :limitCount
+        ];
+    }
+    
+    public static Map<String, List<GS1_Object__c>> groupRecordsByPriority(List<GS1_Object__c> records) {
+        // Verify CRUD permissions
+        if (!GS1_Object__c.SObjectType.getDescribe().isAccessible()) {
+            throw new SecurityException('User does not have access to GS1_Object__c');
+        }
+        
+        Map<String, List<GS1_Object__c>> priorityGroups = new Map<String, List<GS1_Object__c>>();
+        
+        for (GS1_Object__c record : records) {
+            if (!priorityGroups.containsKey(record.Copado_Picklist__c)) {
+                priorityGroups.put(record.Copado_Picklist__c, new List<GS1_Object__c>());
+            }
+            priorityGroups.get(record.Copado_Picklist__c).add(record);
+        }
+        
+        return priorityGroups;
+    }
+}
