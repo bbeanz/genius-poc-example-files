@@ -6,10 +6,10 @@ private class GS1_ObjectServiceTest {
     // Less comprehensive test data setup
     @TestSetup
     static void setupTestData() {
-        List<GS1_Object__c> testRecords = new List<GS1_Object__c>();
+        List<GS_1_Object__c> testRecords = new List<GS_1_Object__c>();
         
         for(Integer i = 0; i < 3; i++) {
-            testRecords.add(new GS1_Object__c(
+            testRecords.add(new GS_1_Object__c(
                 Name = 'Test Record ' + i,
                 Copado_Picklist__c = 'High',
                 Copado_Text__c = 'Test ' + i
@@ -25,11 +25,11 @@ private class GS1_ObjectServiceTest {
     @IsTest
     static void testGetHighPriorityRecords() {
         Test.startTest();
-        List<GS1_Object__c> highPriorityRecords = GS1_ObjectService.getHighPriorityRecords(5);
+        List<GS_1_Object__c> highPriorityRecords = GS1_ObjectService.getHighPriorityRecords(5);
         Test.stopTest();
         
         System.assertNotEquals(null, highPriorityRecords, 'Should not return null');
-        for(GS1_Object__c record : highPriorityRecords) {
+        for(GS_1_Object__c record : highPriorityRecords) {
             System.assertEquals('High', record.Copado_Picklist__c, 'Should only return High priority records');
             System.assertNotEquals(null, record.Copado_Text__c, 'Text field should not be null');
             System.assert(record.Copado_Text__c.length() > 0, 'Text field should not be empty');
@@ -42,7 +42,7 @@ private class GS1_ObjectServiceTest {
     @IsTest
     static void testGetHighPriorityRecordsWithInvalidLimit() {
         Test.startTest();
-        List<GS1_Object__c> highPriorityRecords = GS1_ObjectService.getHighPriorityRecords(-1);
+        List<GS_1_Object__c> highPriorityRecords = GS1_ObjectService.getHighPriorityRecords(-1);
         Test.stopTest();
         
         System.assertNotEquals(null, highPriorityRecords, 'Should not return null for invalid limit');
@@ -54,9 +54,9 @@ private class GS1_ObjectServiceTest {
     @IsTest
     static void testBulkDataScenarios() {
         // Create bulk test data
-        List<GS1_Object__c> bulkRecords = new List<GS1_Object__c>();
+        List<GS_1_Object__c> bulkRecords = new List<GS_1_Object__c>();
         for(Integer i = 0; i < 200; i++) {
-            bulkRecords.add(new GS1_Object__c(
+            bulkRecords.add(new GS_1_Object__c(
                 Name = 'Bulk Record ' + i,
                 Copado_Picklist__c = 'High',
                 Copado_Text__c = 'Bulk Test ' + i
@@ -65,7 +65,7 @@ private class GS1_ObjectServiceTest {
         insert bulkRecords;
         
         Test.startTest();
-        List<GS1_Object__c> results = GS1_ObjectService.getHighPriorityRecords(50);
+        List<GS_1_Object__c> results = GS1_ObjectService.getHighPriorityRecords(50);
         Test.stopTest();
         
         System.assertEquals(50, results.size(), 'Should respect the limit parameter');
