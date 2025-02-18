@@ -1,9 +1,9 @@
 public with sharing class GS1_ObjectService {
     
-    public static List<GS1_Object__c> getHighPriorityRecords(Integer limitCount) {
+    public static List<GS_1_Object__c> getHighPriorityRecords(Integer limitCount) {
         // Verify CRUD permissions
-        if (!GS1_Object__c.SObjectType.getDescribe().isAccessible()) {
-            throw new SecurityException('User does not have access to GS1_Object__c');
+        if (!GS_1_Object__c.SObjectType.getDescribe().isAccessible()) {
+            throw new SecurityException('User does not have access to GS_1_Object__c');
         }
         
         if (limitCount == null || limitCount <= 0) {
@@ -13,7 +13,7 @@ public with sharing class GS1_ObjectService {
         return [
             SELECT Id, Name, Copado_Picklist__c, Copado_Text__c, 
                    CreatedDate, LastModifiedDate
-            FROM GS1_Object__c 
+            FROM GS_1_Object__c 
             WHERE Copado_Picklist__c = 'High'
             AND Copado_Text__c != null
             ORDER BY LastModifiedDate DESC
@@ -22,27 +22,27 @@ public with sharing class GS1_ObjectService {
         ];
     }
     
-    public static Map<String, List<GS1_Object__c>> groupRecordsByPriority(List<GS1_Object__c> records) {
+    public static Map<String, List<GS_1_Object__c>> groupRecordsByPriority(List<GS_1_Object__c> records) {
         // Verify CRUD permissions
-        if (!GS1_Object__c.SObjectType.getDescribe().isAccessible()) {
-            throw new SecurityException('User does not have access to GS1_Object__c');
+        if (!GS_1_Object__c.SObjectType.getDescribe().isAccessible()) {
+            throw new SecurityException('User does not have access to GS_1_Object__c');
         }
         
         if (records == null || records.isEmpty()) {
-            return new Map<String, List<GS1_Object__c>>{
-                'High' => new List<GS1_Object__c>(),
-                'Medium' => new List<GS1_Object__c>(),
-                'Low' => new List<GS1_Object__c>()
+            return new Map<String, List<GS_1_Object__c>>{
+                'High' => new List<GS_1_Object__c>(),
+                'Medium' => new List<GS_1_Object__c>(),
+                'Low' => new List<GS_1_Object__c>()
             };
         }
         
-        Map<String, List<GS1_Object__c>> priorityGroups = new Map<String, List<GS1_Object__c>>{
-            'High' => new List<GS1_Object__c>(),
-            'Medium' => new List<GS1_Object__c>(),
-            'Low' => new List<GS1_Object__c>()
+        Map<String, List<GS_1_Object__c>> priorityGroups = new Map<String, List<GS_1_Object__c>>{
+            'High' => new List<GS_1_Object__c>(),
+            'Medium' => new List<GS_1_Object__c>(),
+            'Low' => new List<GS_1_Object__c>()
         };
         
-        for (GS1_Object__c record : records) {
+        for (GS_1_Object__c record : records) {
             priorityGroups.get(record.Copado_Picklist__c).add(record);
         }
         
