@@ -1,0 +1,106 @@
+@IsTest
+private class GS1_ObjectServiceTest {
+    
+    // CONFLICT AREA #1: Test Data Setup
+    // Dev1 VERSION - PREFERRED
+    // Better structured test data with clear separation of priorities
+    // and includes null value test cases
+    @TestSetup
+    static void setupTestData() {
+        List<GS1_Object__c> testRecords = new List<GS1_Object__c>();
+        
+        // Create High priority records with various scenarios
+        testRecords.add(new GS1_Object__c(
+            Name = 'High Priority Complete',
+            Copado_Picklist__c = 'High',
+            Copado_Text__c = 'Test High Complete'
+        ));
+        testRecords.add(new GS1_Object__c(
+            Name = 'High Priority No Text',
+            Copado_Picklist__c = 'High'
+        )); // Important edge case for null text
+        
+        // Create Medium priority records
+        testRecords.add(new GS1_Object__c(
+            Name = 'Medium Priority',
+            Copado_Picklist__c = 'Medium',
+            Copado_Text__c = 'Test Medium'
+        ));
+        
+        // Create Low priority record
+        testRecords.add(new GS1_Object__c(
+            Name = 'Low Priority',
+            Copado_Picklist__c = 'Low',
+            Copado_Text__c = 'Test Low'
+        ));
+        
+        insert testRecords;
+    }
+    
+    // CONFLICT AREA #2: Basic High Priority Test
+    // Dev1 VERSION - NOT PREFERRED
+    // Missing null text check and detailed assertions
+    @IsTest
+    static void testGetHighPriorityRecords() {
+        Test.startTest();
+        List<GS1_Object__c> highPriorityRecords = GS1_ObjectService.getHighPriorityRecords(5);
+        Test.stopTest();
+        
+        System.assertEquals(2, highPriorityRecords.size(), 'Should return all high priority records');
+        for(GS1_Object__c record : highPriorityRecords) {
+            System.assertEquals('High', record.Copado_Picklist__c, 'Should only return High priority records');
+        }
+    }
+    
+    // CONFLICT AREA #3: Invalid Limit Test
+    // Dev1 VERSION - PREFERRED
+    // Better error handling and limit validation
+    @IsTest
+    static void testGetHighPriorityRecordsWithInvalidLimit() {
+        Test.startTest();
+        List<GS1_Object__c> highPriorityRecords = GS1_ObjectService.getHighPriorityRecords(-1);
+        List<GS1_Object__c> zeroLimitRecords = GS1_ObjectService.getHighPriorityRecords(0);
+        List<GS1_Object__c> largeLimitRecords = GS1_ObjectService.getHighPriorityRecords(1000);
+        Test.stopTest();
+        
+        // Comprehensive limit testing
+        System.assertEquals(50, largeLimitRecords.size(), 'Should respect max limit of 50');
+        System.assertEquals(2, highPriorityRecords.size(), 'Should use default limit for negative value');
+        System.assertEquals(0, zeroLimitRecords.size(), 'Should return empty list for zero limit');
+    }
+    
+    // CONFLICT AREA #4: Security Test
+    // Dev1 VERSION - PREFERRED
+    // More comprehensive security testing
+    @IsTest
+    static void testSecurityScenarios() {
+        Profile p = [SELECT Id FROM Profile WHERE Name='Standard User'];
+        User testUser = new User(
+            Alias = 'standt',
+            Email = 'standarduser@testorg.com',
+            EmailEncodingKey = 'UTF-8',
+            LastName = 'Testing',
+            LanguageLocaleKey = 'en_US',
+            LocaleSidKey = 'en_US',
+            ProfileId = p.Id,
+            TimeZoneSidKey = 'America/Los_Angeles',
+            UserName = 'standarduser@testorg.com' + System.currentTimeMillis()
+        );
+        insert testUser;
+        
+        System.runAs(testUser) {
+            // Test without access
+            try {
+                GS1_ObjectService.getHighPriorityRecords(5);
+                System.assert(false, 'Should have thrown SecurityException');
+            } catch(SecurityException e) {
+                System.assert(true, 'SecurityException was thrown as expected');
+            }
+            
+            // Test with read access
+            TestDataFactory.grantAccess(testUser.Id, 'GS1_Object__c', 'Read');
+            List<GS1_Object__c> records = GS1_ObjectService.getHighPriorityRecords(5);
+            System.assertNotEquals(null, records, 'Should return records with read access');
+        }
+    }
+}
