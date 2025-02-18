@@ -9,7 +9,7 @@ private class AccountServiceTest {
         for(Integer i = 0; i < 3; i++) {
             testAccounts.add(new Account(
                 Name = 'Test Account ' + i,
-                IsActive__c = true,
+                Active__c = true,
                 AnnualRevenue = 1000.00 * (i + 1),
                 Rating = 'Hot' // Keep this field in conflict resolution
             ));
@@ -17,7 +17,7 @@ private class AccountServiceTest {
         
         testAccounts.add(new Account(
             Name = 'Inactive Account',
-            IsActive__c = false,
+            Active__c = false,
             AnnualRevenue = 5000.00,
             Rating = 'Warm' // Keep this field in conflict resolution
         ));
@@ -33,7 +33,7 @@ private class AccountServiceTest {
         
         // TO BE REPLACED: Additional assertion for revenue sorting from Dev Sandbox 2 should be added here
         System.assertEquals(3, activeAccounts.size(), 'Should return only active accounts');
-        System.assert(activeAccounts[0].IsActive__c, 'Returned accounts should be active');
+        System.assert(activeAccounts[0].Active__c, 'Returned accounts should be active');
     }
     
     @IsTest
@@ -47,7 +47,7 @@ private class AccountServiceTest {
     
     @IsTest
     static void testCalculateTotalRevenue() {
-        List<Account> activeAccounts = [SELECT Id, AnnualRevenue FROM Account WHERE IsActive__c = true];
+        List<Account> activeAccounts = [SELECT Id, AnnualRevenue FROM Account WHERE Active__c = true];
         
         Test.startTest();
         Decimal totalRevenue = AccountService.calculateTotalRevenue(activeAccounts);
