@@ -9,14 +9,14 @@ private class AccountServiceTest {
         for(Integer i = 0; i < 3; i++) {
             testAccounts.add(new Account(
                 Name = 'Test Account ' + i,
-                IsActive__c = true,
+                Ice_Hockey__c = true,
                 AnnualRevenue = 1000.00 * (i + 1)
             ));
         }
         
         testAccounts.add(new Account(
             Name = 'Inactive Account',
-            IsActive__c = false,
+            Ice_Hockey__c = false,
             AnnualRevenue = 5000.00
         ));
         
@@ -30,7 +30,7 @@ private class AccountServiceTest {
         Test.stopTest();
         
         System.assertEquals(3, activeAccounts.size(), 'Should return only active accounts');
-        System.assert(activeAccounts[0].IsActive__c, 'Returned accounts should be active');
+        System.assert(activeAccounts[0].Ice_Hockey__c, 'Returned accounts should be active');
         // RECOMMENDED: Additional assertion for revenue sorting
         System.assert(activeAccounts[0].AnnualRevenue >= activeAccounts[1].AnnualRevenue, 
             'Accounts should be sorted by revenue'); // Keep this assertion in conflict resolution
@@ -47,7 +47,7 @@ private class AccountServiceTest {
     
     @IsTest
     static void testCalculateTotalRevenue() {
-        List<Account> activeAccounts = [SELECT Id, AnnualRevenue FROM Account WHERE IsActive__c = true];
+        List<Account> activeAccounts = [SELECT Id, AnnualRevenue FROM Account WHERE Ice_Hockey__c = true];
         
         Test.startTest();
         Decimal totalRevenue = AccountService.calculateTotalRevenue(activeAccounts);
