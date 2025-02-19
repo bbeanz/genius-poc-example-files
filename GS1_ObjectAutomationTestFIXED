@@ -1,0 +1,104 @@
+/**
+ * @description Test class for GS1_ObjectAutomation
+ * @author Dev2
+ * @date 2025-02-18
+ */
+@IsTest
+private class GS1_ObjectAutomationTest {
+    
+    @TestSetup
+    static void setupTestData() {
+        List<GS_1_Object__c> testRecords = new List<GS_1_Object__c>{
+            new GS_1_Object__c(Name = 'Test Low 1', Copado_Picklist__c = 'Low'),
+            new GS_1_Object__c(Name = 'Test Low 2', Copado_Picklist__c = 'Low'),
+            new GS_1_Object__c(Name = 'Test High', Copado_Picklist__c = 'High'),
+            new GS_1_Object__c(Name = 'Test Medium', Copado_Picklist__c = 'Medium')
+        };
+        insert testRecords;
+    }
+    
+    @IsTest
+    static void testUpdateTextForLowPriority_Success() {
+        // Get test records
+        List<GS_1_Object__c> testRecords = [SELECT Id, Copado_Picklist__c 
+                                          FROM GS_1_Object__c 
+                                          WHERE Copado_Picklist__c = 'Low'];
+        
+        Test.startTest();
+        GS1_ObjectAutomation.updateTextForLowPriority(testRecords);
+        Test.stopTest();
+        
+        // Verify results
+        List<GS_1_Object__c> updatedRecords = [SELECT Id, Copado_Text__c 
+                                             FROM GS_1_Object__c 
+                                             WHERE Copado_Picklist__c = 'Low'];
+        
+        System.assertEquals(2, updatedRecords.size(), 'Should have updated 2 records');
+        for (GS_1_Object__c record : updatedRecords) {
+            System.assertEquals('Autofilled - Picklist set Low', record.Copado_Text__c,
+                              'Text field should be updated for Low priority records');
+        }
+    }
+    
+    @IsTest
+    static void testUpdateTextForLowPriority_NoUpdates() {
+        List<GS_1_Object__c> testRecords = [SELECT Id, Copado_Picklist__c 
+                                          FROM GS_1_Object__c 
+                                          WHERE Copado_Picklist__c != 'Low'];
+        
+        Test.startTest();
+        GS1_ObjectAutomation.updateTextForLowPriority(testRecords);
+        Test.stopTest();
+        
+        // Verify no updates occurred
+        List<GS_1_Object__c> verifyRecords = [SELECT Id, Copado_Text__c 
+                                            FROM GS_1_Object__c 
+                                            WHERE Copado_Picklist__c != 'Low'];
+        
+        for (GS_1_Object__c record : verifyRecords) {
+            System.assertEquals(null, record.Copado_Text__c,
+                              'Text field should not be updated for non-Low priority records');
+        }
+    }
+    
+    @IsTest
+    static void testUpdateTextForLowPriority_BulkOperation() {
+        // Create bulk test data
+        List<GS_1_Object__c> bulkRecords = new List<GS_1_Object__c>();
+        for (Integer i = 0; i < 200; i++) {
+            bulkRecords.add(new GS_1_Object__c(
+                Name = 'Bulk Test ' + i,
+                Copado_Picklist__c = 'Low'
+            ));
+        }
+        insert bulkRecords;
+        
+        Test.startTest();
+        GS1_ObjectAutomation.updateTextForLowPriority(bulkRecords);
+        Test.stopTest();
+        
+        // Verify bulk updates
+        List<GS_1_Object__c> verifyBulk = [SELECT Id, Copado_Text__c 
+                                         FROM GS_1_Object__c 
+                                         WHERE Name LIKE 'Bulk Test%'];
+        
+        System.assertEquals(200, verifyBulk.size(), 'Should have processed all bulk records');
+        for (GS_1_Object__c record : verifyBulk) {
+            System.assertEquals('Autofilled - Picklist set Low', record.Copado_Text__c,
+                              'All bulk records should be updated');
+        }
+    }
+    
+    @IsTest
+    static void testUpdateTextForLowPriority_NullInput() {
+        Test.startTest();
+        try {
+            GS1_ObjectAutomation.updateTextForLowPriority(null);
+            System.assert(false, 'Should have thrown an exception');
+        } catch (IllegalArgumentException e) {
+            System.assert(e.getMessage().contains('Input records cannot be null'),
+                         'Should throw appropriate error message');
+        }
+        Test.stopTest();
+    }
+}
