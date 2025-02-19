@@ -1,0 +1,42 @@
+/**
+ * @description Automation class to handle GS_1_Object__c field updates
+ * @author Dev2
+ * @date 2025-02-18
+ */
+public with sharing class GS1_ObjectAutomation {
+    
+    /**
+     * @description Updates Copado_Text__c field when Copado_Picklist__c is set to 'Low'
+     * @param newRecords List of GS_1_Object__c records to process
+     * @throws IllegalArgumentException if input is null
+     */
+    public static void updateTextForLowPriority(List<GS_1_Object__c> newRecords) {
+        // Input validation
+        if (newRecords == null) {
+            throw new IllegalArgumentException('Input records cannot be null');
+        }
+        
+        List<GS_1_Object__c> recordsToUpdate = new List<GS_1_Object__c>();
+        
+        // Process records in bulk
+        for (GS_1_Object__c record : newRecords) {
+            if (record.Copado_Picklist__c == 'Low') {
+                recordsToUpdate.add(new GS_1_Object__c(
+                    Id = record.Id,
+                    Copado_Text__c = 'Autofilled - Picklist set Low'
+                ));
+            }
+        }
+        
+        // Bulk update with error handling
+        if (!recordsToUpdate.isEmpty()) {
+            try {
+                update recordsToUpdate;
+            } catch (DmlException e) {
+                // Log error or handle as needed
+                System.debug(LoggingLevel.ERROR, 'Error updating records: ' + e.getMessage());
+                throw e;
+            }
+        }
+    }
+}
