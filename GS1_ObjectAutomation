@@ -1,0 +1,23 @@
+// Poor quality class with multiple PMD violations
+public class GS1_ObjectAutomation {
+    // Missing sharing declaration
+    // Poor variable naming
+    // Not bulkified
+    // No error handling
+    public static void doStuff(List<GS_1_Object__c> recs) {
+        // Querying inside loop - PMD violation
+        // SOQL in loop
+        for(GS_1_Object__c o : recs) {
+            if(o.Copado_Picklist__c == 'Low') {
+                GS_1_Object__c obj = [SELECT Id FROM GS_1_Object__c WHERE Id = :o.Id];
+                obj.Copado_Text__c = 'Autofilled - Picklist set Low';
+                update obj; // DML in loop
+            }
+        }
+    }
+    
+    // Unused method - PMD violation
+    public static void unusedMethod() {
+        String s = 'unused';
+    }
+}
