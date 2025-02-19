@@ -1,0 +1,22 @@
+@IsTest
+// Poor test class with inadequate coverage
+private class GS1_ObjectAutomationTest {
+    
+    // Only testing one scenario
+    // No negative testing
+    // No bulk testing
+    @IsTest
+    static void testUpdateText() {
+        GS_1_Object__c obj = new GS_1_Object__c(
+            Name = 'Test',
+            Copado_Picklist__c = 'Low'
+        );
+        insert obj;
+        
+        Test.startTest();
+        GS1_ObjectAutomation.doStuff(new List<GS_1_Object__c>{obj});
+        Test.stopTest();
+        
+        // Missing assertions
+    }
+}
