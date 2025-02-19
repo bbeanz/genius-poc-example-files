@@ -1,6 +1,6 @@
 /**
  * @description Automation class to handle GS_1_Object__c field updates
- * @author Dev2
+ * @author Dev1
  * @date 2025-02-18
  */
 public with sharing class GS1_ObjectAutomation {
